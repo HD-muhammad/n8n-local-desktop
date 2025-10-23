@@ -3,6 +3,7 @@ set -eu
 
 POSTGRES_HOST="${DB_POSTGRESDB_HOST:-postgres}"
 POSTGRES_PORT="${DB_POSTGRESDB_PORT:-5432}"
+PATH="${PATH:-/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin}"
 
 unset WEBHOOK_URL N8N_WEBHOOK_TUNNEL_URL || true
 
@@ -69,7 +70,8 @@ NODE
 if [ -z "${PUBLIC_BASE_URL:-}" ]; then
   echo "PUBLIC_BASE_URL not set, attempting to fetch from ngrok API..."
   attempt=0
-  while [ "$attempt" -lt 30 ]; do
+  sleep 3
+  while [ "$attempt" -lt 90 ]; do
     PUBLIC_URL=""
     if PUBLIC_URL=$(resolve_public_url) && [ -n "$PUBLIC_URL" ]; then
       export WEBHOOK_URL="$PUBLIC_URL"
@@ -78,7 +80,7 @@ if [ -z "${PUBLIC_BASE_URL:-}" ]; then
       break
     fi
     attempt=$((attempt + 1))
-    echo "ngrok public URL not ready (attempt $attempt/30). Retrying..."
+    echo "ngrok public URL not ready (attempt $attempt/90). Retrying..."
     sleep 2
   done
   if [ -z "${WEBHOOK_URL:-}" ]; then
@@ -89,4 +91,4 @@ else
   export N8N_WEBHOOK_TUNNEL_URL="${PUBLIC_BASE_URL}"
 fi
 
-exec /docker-entrypoint.sh n8n start
+exec /docker-entrypoint.sh "$@"
