@@ -1,0 +1,9 @@
+version: "2"
+web_addr: 0.0.0.0:4040
+tunnels:
+  n8n:
+    proto: http
+    addr: caddy:80
+    schemes:
+      - https
+      - http
