@@ -1,0 +1,14 @@
+{
+  auto_https off
+}
+
+:80 {
+  encode zstd gzip
+  header {
+    X-Forwarded-For {remote_host}
+    X-Forwarded-Proto {scheme}
+    X-Forwarded-Host {host}
+    Cache-Control "no-store"
+  }
+  reverse_proxy http://n8n:5678
+}
